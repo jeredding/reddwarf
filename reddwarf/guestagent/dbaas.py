@@ -51,7 +51,8 @@ from reddwarf.openstack.common.gettextutils import _
 LOG = logging.getLogger(__name__)
 
 SERVICE_REGISTRY = {
-    'mysql': 'reddwarf.guestagent.manager.mysql.Manager', }
+    'mysql': 'reddwarf.guestagent.manager.mysql.Manager', 
+    'redis': 'reddwarf.guestagent.manager.redis.Manager' }
 
 
 class Interrogator(object):

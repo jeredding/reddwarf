@@ -1,0 +1,23 @@
+Format: 1.8
+Date: Fri, 11 Mar 2011 14:32:03 +0600
+Source: dbaas-rediscnf
+Binary: dbaas-rediscnf
+Architecture: all
+Version: 1.0-1
+Distribution: lucid
+Urgency: low
+Maintainer: DBaaS-Dev <dbaas-dev@rackspace.com>
+Changed-By: DBaaS-Dev <dbaas-dev@rackspace.com>
+Description: 
+ dbaas-rediscnf - redis.conf tempaltes for Database as a Service.
+Changes: 
+ dbaas-rediscnf (1.0-1) lucid; urgency=low
+ .
+   [ Michael Basnight ]
+   * Created the initial default redis.conf template
+Checksums-Sha1: 
+ f8ee1263445e7699481602886452291558d4d6bd 2982 dbaas-rediscnf_1.0-1_all.deb
+Checksums-Sha256: 
+ c1f29243d879921a420b88df4fd72a8922e6559f82334fb52fe10ee4808bb9df 2982 dbaas-rediscnf_1.0-1_all.deb
+Files: 
+ 00cbe908346ee51735563f30904aec7d 2982 utils extra dbaas-rediscnf_1.0-1_all.deb

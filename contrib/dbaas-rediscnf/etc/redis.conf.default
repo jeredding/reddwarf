@@ -1,0 +1,35 @@
+# = General ==================================================================
+#bind 127.0.0.1
+daemonize yes
+pidfile /var/run/redis.pid
+port 9000
+databases 20
+# = Limits ===================================================================
+maxmemory 100m
+maxmemory-policy volatile-lru
+maxmemory-samples 3
+maxclients 5000
+timeout 150
+# = Persistence ==============================================================
+dir /opt/redis/
+appendonly yes
+appendfilename /opt/redis/appendonly.aof
+Appendfsync no
+dbfilename dump.rdb
+# = Slowlog ==================================================================
+slowlog-log-slower-than -1
+# = Advanced Config ==========================================================
+hash-max-ziplist-entries 64
+hash-max-ziplist-value 512
+list-max-ziplist-entries 512
+list-max-ziplist-value 64
+set-max-intset-entries 512
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+activerehashing yes
+# = LUA Scripting ============================================================
+lua-time-limit 5000
+# = Client Limits ============================================================
+client-output-buffer-limit normal 0 0 0
+client-output-buffer-limit slave 256mb 64mb 60
+client-output-buffer-limit pubsub 32mb 8mb 60

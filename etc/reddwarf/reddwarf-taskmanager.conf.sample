@@ -36,7 +36,7 @@ swift_url = http://localhost:8080/v1/AUTH_
 reddwarf_volume_support = True
 block_device_mapping = vdb
 device_path = /dev/vdb
-mount_point = /var/lib/mysql
+mount_point = /opt/redis
 volume_time_out=30
 server_delete_time_out=480
 
