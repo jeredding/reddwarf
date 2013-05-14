@@ -1,4 +1,5 @@
 import os
+from eventlet.green import subprocess
 
 from reddwarf.common import utils
 from reddwarf.common.exception import ProcessExecutionError
@@ -66,7 +67,7 @@ class Manager(periodic_task.PeriodicTasks):
         raise NotImplementedError()
 
     def prepare(self, context, databases, memory_mb, users, device_path=None,
-                mount_point=None):
+                mount_point=None, password=None):
         """Makes ready DBAAS on a Guest container."""
         Status.get().begin_install()
         
@@ -93,8 +94,19 @@ class Manager(periodic_task.PeriodicTasks):
         utils.execute_with_timeout("sudo", "apt-get", "--force-yes", "-y", "install", "dbaas-rediscnf")
         utils.execute_with_timeout("sudo", "rm", "/etc/redis/redis.conf")
         utils.execute_with_timeout("sudo", "ln", "-s", "/etc/dbaas/redis.cnf/redis.conf.default", "/etc/redis/redis.conf")
-        
-        utils.execute_with_timeout("sudo","service","redis-server","restart")
+
+        # Add the password to the redis server, but be sure to save it for resizes
+        with open("/tmp/password.conf", "a") as conf:
+            conf.write("requirepass %s" % password)
+        # Move w/ linux commands
+        utils.execute_with_timeout("sudo", "mv", "/tmp/password.conf", "/opt/redis")
+            
+        process = subprocess.Popen("cat /opt/redis/password.conf | sudo tee -a /etc/redis/redis.conf", shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        process.wait()
+
+        utils.execute_with_timeout("sudo", "service", "redis-server", "restart")
         Status.get().end_install()
 
     def restart(self, context):
@@ -111,18 +123,7 @@ class Manager(periodic_task.PeriodicTasks):
         raise NotImplementedError()
 
 
-# ADMIN_USER_NAME = "os_admin"
-# ENGINE = None
 CONF = cfg.CONF
-
-# def get_engine():
-#         """Create the default engine with the updated admin user"""
-#         global ENGINE
-#         if ENGINE:
-#             return ENGINE
-#         ENGINE = psycopg2.connect(user=ADMIN_USER_NAME, database="postgres")
-#         ENGINE.set_isolation_level(0)
-#         return ENGINE
 
 
 class Status(object):

@@ -201,13 +201,15 @@ class API(proxy.RpcProxy):
         return self._call("get_diagnostics", AGENT_LOW_TIMEOUT)
 
     def prepare(self, memory_mb, databases, users,
-                device_path='/dev/vdb', mount_point='/mnt/volume'):
+                device_path='/dev/vdb', mount_point='/mnt/volume',
+                password=None):
         """Make an asynchronous call to prepare the guest
            as a database container"""
         LOG.debug(_("Sending the call to prepare the Guest"))
         self._cast_with_consumer(
             "prepare", databases=databases, memory_mb=memory_mb,
-            users=users, device_path=device_path, mount_point=mount_point)
+            users=users, device_path=device_path, mount_point=mount_point,
+            password=password)
 
     def restart(self):
         """Restart the MySQL server."""

@@ -55,6 +55,8 @@ class InstanceView(object):
         if CONF.reddwarf_volume_support:
             instance_dict['volume'] = {'size': self.instance.volume_size}
         LOG.debug(instance_dict)
+        if self.instance.password:
+            instance_dict['password'] = self.instance.password
         return {"instance": instance_dict}
 
     def _build_links(self):

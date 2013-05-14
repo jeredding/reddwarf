@@ -33,6 +33,7 @@ from reddwarf.instance.tasks import InstanceTask
 from reddwarf.instance.tasks import InstanceTasks
 from reddwarf.taskmanager import api as task_api
 from reddwarf.openstack.common import log as logging
+from reddwarf.openstack.common import uuidutils
 from reddwarf.openstack.common.gettextutils import _
 
 
@@ -111,10 +112,11 @@ class SimpleInstance(object):
 
     """
 
-    def __init__(self, context, db_info, service_status):
+    def __init__(self, context, db_info, service_status, password=None):
         self.context = context
         self.db_info = db_info
         self.service_status = service_status
+        self.password = password
 
     @property
     def addresses(self):
@@ -456,13 +458,15 @@ class Instance(BuiltInstance):
                     context)
                 security_groups = [security_group["name"]]
 
+            password = uuidutils.generate_uuid()
             task_api.API(context).create_instance(db_info.id, name, flavor_id,
                                                   flavor.ram, image_id,
                                                   databases, users,
                                                   service_type, volume_size,
-                                                  security_groups, backup_id)
+                                                  security_groups, backup_id,
+                                                  password=password)
 
-            return SimpleInstance(context, db_info, service_status)
+            return SimpleInstance(context, db_info, service_status, password=password)
 
         validate_volume_size(volume_size)
         return run_with_quotas(context.tenant,
