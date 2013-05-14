@@ -14,6 +14,7 @@ from reddwarf.instance import models as rd_models
 
 LOG = logging.getLogger(__name__)
 
+DBAAS_REDISCNF = "/etc/dbaas/redis.cnf/redis.conf.%dM"
 
 class Manager(periodic_task.PeriodicTasks):
 
@@ -91,36 +92,45 @@ class Manager(periodic_task.PeriodicTasks):
         utils.execute_with_timeout("sudo", "apt-get", "install", "redis-server", "-y")
         # Give ownership of optdir to redis user
         utils.execute_with_timeout("sudo", "chown", "redis:redis", "/opt/redis")
-        utils.execute_with_timeout("sudo", "apt-get", "--force-yes", "-y", "install", "dbaas-rediscnf")
-        utils.execute_with_timeout("sudo", "rm", "/etc/redis/redis.conf")
-        utils.execute_with_timeout("sudo", "ln", "-s", "/etc/dbaas/redis.cnf/redis.conf.default", "/etc/redis/redis.conf")
 
-        # Add the password to the redis server, but be sure to save it for resizes
-        with open("/tmp/password.conf", "a") as conf:
-            conf.write("requirepass %s" % password)
-        # Move w/ linux commands
-        utils.execute_with_timeout("sudo", "mv", "/tmp/password.conf", "/opt/redis")
-            
-        process = subprocess.Popen("cat /opt/redis/password.conf | sudo tee -a /etc/redis/redis.conf", shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE)
-        process.wait()
+        self._update_conf(memory_mb, password=password)
 
         utils.execute_with_timeout("sudo", "service", "redis-server", "restart")
         Status.get().end_install()
 
     def restart(self, context):
-        raise NotImplementedError()
+        utils.execute_with_timeout("sudo", "service", "redis-server", "restart")
 
     def start_db_with_conf_changes(self, context, updated_memory_size):
-        raise NotImplementedError()
+        # Update the conf
+        self._update_conf(updated_memory_size)
+        # Restart redis
+        utils.execute_with_timeout("sudo", "service", "redis-server", "restart")
 
     def stop_db(self, context, do_not_start_on_reboot=False):
-        raise NotImplementedError()
+        utils.execute_with_timeout("sudo", "service", "redis-server", "stop")
 
-    def get_filesystem_stats(self, context, fs_path):
+    def get_filesystem_stats(self, context, fs_path="/opt/redis"):
         """ Gets the filesystem stats for the path given """
-        raise NotImplementedError()
+        return dbaas.Interrogator().get_filesystem_volume_stats(fs_path)
+
+    def _update_conf(self, memory_size, password=None):
+        utils.execute_with_timeout("sudo", "apt-get", "--force-yes", "-y", "install", "dbaas-rediscnf")
+        utils.execute_with_timeout("sudo", "rm", "/etc/redis/redis.conf")
+        redis_conf = DBAAS_REDISCNF % memory_size
+        utils.execute_with_timeout("sudo", "ln", "-s", redis_conf, "/etc/redis/redis.conf")
+
+        # Add the password to the redis server, but be sure to save it for resizes
+        if password:
+            with open("/tmp/password.conf", "a") as conf:
+                conf.write("requirepass %s" % password)
+            # Move w/ linux commands
+            utils.execute_with_timeout("sudo", "mv", "/tmp/password.conf", "/opt/redis")
+
+        process = subprocess.Popen("cat /opt/redis/password.conf | sudo tee -a /etc/redis/redis.conf", shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE)
+        process.wait()
 
 
 CONF = cfg.CONF

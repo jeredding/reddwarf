@@ -35,15 +35,10 @@ for i in "${MEMSIZE[@]}"; do
     cat ../etc/redis.conf.base | while read line; do
         if [[ `expr "$line" : ".*{.*}"` != "0" ]]; then
             oldval=`echo $line | sed -e 's/.*{\(.*\)}.*/\1/'`
-            prop=`echo $line | sed -e 's/^\(.*\) = {100}/\1/'`
-            if [[ $prop == "max_connections" ]]; then
-                newval=`echo "($oldval * $multiplier) + 10" | bc`
-            else
-                newval=`echo "$oldval * $multiplier" | bc`
-            fi
+            newval=`echo "$oldval * $multiplier" | bc`
             line=`echo $line | sed -e "s/{$oldval}/$newval/"`
         fi
-        echo $line >> etc/my.cnf.$key
+        echo $line >> etc/redis.conf.$key
     done
 done
 
