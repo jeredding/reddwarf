@@ -5,6 +5,7 @@ from reddwarf.common import utils
 from reddwarf.common.exception import ProcessExecutionError
 from reddwarf.common import cfg
 from reddwarf.guestagent import dbaas
+from reddwarf.guestagent import pkg
 from reddwarf.guestagent import volume
 from reddwarf.guestagent.db import models
 from reddwarf.openstack.common import log as logging
@@ -115,7 +116,8 @@ class Manager(periodic_task.PeriodicTasks):
         return dbaas.Interrogator().get_filesystem_volume_stats(fs_path)
 
     def _update_conf(self, memory_size, password=None):
-        utils.execute_with_timeout("sudo", "apt-get", "--force-yes", "-y", "install", "dbaas-rediscnf")
+        pkg.pkg_install("dbaas-rediscnf", 1000)
+        # utils.execute_with_timeout("sudo", "apt-get", "--force-yes", "-y", "install", "dbaas-rediscnf")
         utils.execute_with_timeout("sudo", "rm", "/etc/redis/redis.conf")
         redis_conf = DBAAS_REDISCNF % memory_size
         utils.execute_with_timeout("sudo", "ln", "-s", redis_conf, "/etc/redis/redis.conf")
