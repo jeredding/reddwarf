@@ -175,10 +175,11 @@ class Status(object):
     def _get_actual_db_status(self):
         try:
             out, err = utils.execute_with_timeout(
-                "sudo", "service", "redis-server", "status")
-            if out.startswith('redis-server start/running'):
-                LOG.info("Service Status is RUNNING.")
-                return rd_models.ServiceStatuses.RUNNING
+                "ps", "aux")
+            for line in out.split("\n"):
+                if "redis-server" in line:
+                    LOG.info("Service Status is RUNNING.")
+                    return rd_models.ServiceStatuses.RUNNING
             else:
                 return rd_models.ServiceStatuses.SHUTDOWN
         except ProcessExecutionError as e:
