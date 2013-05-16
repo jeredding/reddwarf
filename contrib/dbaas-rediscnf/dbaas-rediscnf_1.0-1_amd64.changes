@@ -16,8 +16,8 @@ Changes:
    [ Michael Basnight ]
    * Created the initial default redis.conf template
 Checksums-Sha1: 
- f8ee1263445e7699481602886452291558d4d6bd 2982 dbaas-rediscnf_1.0-1_all.deb
+ 575bc0873a7cc83a86ea24bb3043a7883efada54 3436 dbaas-rediscnf_1.0-1_all.deb
 Checksums-Sha256: 
- c1f29243d879921a420b88df4fd72a8922e6559f82334fb52fe10ee4808bb9df 2982 dbaas-rediscnf_1.0-1_all.deb
+ eb05b1ac5df5b60031ab01dd3e5b20f24a28b119f8e9c4b061a08e940f6315f9 3436 dbaas-rediscnf_1.0-1_all.deb
 Files: 
- 00cbe908346ee51735563f30904aec7d 2982 utils extra dbaas-rediscnf_1.0-1_all.deb
+ 08cc0abc103cf32172a55ef08588525d 3436 utils extra dbaas-rediscnf_1.0-1_all.deb
